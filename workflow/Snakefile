@@ -1,0 +1,23 @@
+
+SAMPLES = ["IT-GRA-2019-003",
+            "CY-PAF-2018-004"]
+
+CHROMOSOMES = ["chr28"]
+
+rule all:
+    input:
+        expand("test/vcf-merged/{sample}.{chr}.vcf.gz",
+        sample=SAMPLES,
+        chr=CHROMOSOMES)
+
+
+rule merge_genotypes:
+    input:
+        unphased="test/vcf-unphased/{sample}.RG.recalibrated.{chr}.vcf.gz",
+        phased="test/vcf-phased/{sample}_{chr}.vcf.gz",
+    output:
+        merged_vcf="test/vcf-merged/{sample}.{chr}.vcf.gz",
+    log:
+        "logs/merge_genotypes/{sample}_{chr}.log"
+    shell:
+        "python workflow/scripts/merge_genotypes/merge_genotypes.py {input.unphased} {input.phased} {output.merged_vcf} > {log}"
