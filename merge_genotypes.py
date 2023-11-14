@@ -1,4 +1,9 @@
 """
+Author: Fritjof Lammers
+Date: 2023-11-14
+
+License: MIT
+
 This script reads in a VCF file for a single sample (called "A") and another VCF-like file that contains phased genotypes (called "B"). 
 
 The unphased genotype in file A is indicated by "0/0", "0/1", or "1/1". 
@@ -166,7 +171,7 @@ def replace_genotypes(file_a, file_b):
 
 if __name__ == "__main__":
     if len(sys.argv) != 4:
-        sys.exit("Usage: python script.py <file_A.vcf> <file_B.vcf>")
+        sys.exit("Usage: python script.py <file_A.vcf[.gz]> <file_B.vcf[.gz]> <output.vcf[.gz]")
     
     file_a_path = sys.argv[1]
     file_b_path = sys.argv[2]
