@@ -1,8 +1,15 @@
+from snakemake.remote.SFTP import RemoteProvider
 
-SAMPLES = ["IT-GRA-2019-003",
-            "CY-PAF-2018-004"]
+SFTP = RemoteProvider() #username="burri", password="Hispanica**78")
 
-CHROMOSOMES = ["chr28"]
+SAMPLES = [
+    "E-GUI-2017-001",
+    "GR-DIS-2019-020",
+    "E-GUI-2017-003", 
+    "GR-EVV-2019-005"
+    ]
+
+CHROMOSOMES = ["chr1", "chr1A", "chr2", "chr3", "chr4", "chr5"]
 
 rule all:
     input:
@@ -10,6 +17,14 @@ rule all:
         sample=SAMPLES,
         chr=CHROMOSOMES)
 
+
+rule download_files:
+    output:
+        unphased="test/vcf-unphased/{sample}.RG.recalibrated.{chr}.vcf.gz",
+        phased="test/vcf-phased/{sample}_{chr}.vcf.gz",
+    shell:
+        "scp frontend1.eve.ufz.de:/gpfs1/data/oenanthe/niloo/MSMC2/hisponicaComplex/unphased-bamFiles/new-bamFiles-recalibrated/phasing-vcf/{wildcards.sample}_{wildcards.chr}.vcf.gz {output.phased}; "
+        "scp frontend1.eve.ufz.de:/gpfs1/data/oenanthe/niloo/MSMC2/hisponicaComplex/unphased-bamFiles/new-bamFiles-recalibrated/vcf-bed/{wildcards.sample}.RG.recalibrated.{wildcards.chr}.vcf.gz {output.unphased}"
 
 rule merge_genotypes:
     input:
@@ -21,3 +36,7 @@ rule merge_genotypes:
         "logs/merge_genotypes/{sample}_{chr}.log"
     shell:
         "python workflow/scripts/merge_genotypes/merge_genotypes.py {input.unphased} {input.phased} {output.merged_vcf} > {log}"
+
+
+
+# add upload rule 
