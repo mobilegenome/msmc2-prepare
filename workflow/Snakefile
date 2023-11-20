@@ -1,42 +1,44 @@
-from snakemake.remote.SFTP import RemoteProvider
 
-SFTP = RemoteProvider() #username="burri", password="Hispanica**78")
+configfile: "config.yaml"
 
-SAMPLES = [
-    "E-GUI-2017-001",
-    "GR-DIS-2019-020",
-    "E-GUI-2017-003", 
-    "GR-EVV-2019-005"
-    ]
-
-CHROMOSOMES = ["chr1", "chr1A", "chr2", "chr3", "chr4", "chr5"]
+SAMPLES     = config["SAMPLES"]
+CHROMOSOMES = config["CHROMOSOMES"]
 
 rule all:
     input:
-        expand("test/vcf-merged/{sample}.{chr}.vcf.gz",
+        expand("results/vcf-merged/{sample}.{chr}.vcf.gz",
         sample=SAMPLES,
-        chr=CHROMOSOMES)
+        chr=CHROMOSOMES),
+        "results/overview.tsv"
 
-
-rule download_files:
-    output:
-        unphased="test/vcf-unphased/{sample}.RG.recalibrated.{chr}.vcf.gz",
-        phased="test/vcf-phased/{sample}_{chr}.vcf.gz",
-    shell:
-        "scp frontend1.eve.ufz.de:/gpfs1/data/oenanthe/niloo/MSMC2/hisponicaComplex/unphased-bamFiles/new-bamFiles-recalibrated/phasing-vcf/{wildcards.sample}_{wildcards.chr}.vcf.gz {output.phased}; "
-        "scp frontend1.eve.ufz.de:/gpfs1/data/oenanthe/niloo/MSMC2/hisponicaComplex/unphased-bamFiles/new-bamFiles-recalibrated/vcf-bed/{wildcards.sample}.RG.recalibrated.{wildcards.chr}.vcf.gz {output.unphased}"
+if config["DOWNLOAD_VIA_SCP"]:
+    rule download_files:
+        output:
+            unphased=temp("test/vcf-unphased/{sample}.{chr}.vcf.gz"),
+            phased=temp("test/vcf-phased/{sample}.{chr}.vcf.gz"),
+        shell:
+           config["DOWNLOAD_CMD"]
 
 rule merge_genotypes:
     input:
-        unphased="test/vcf-unphased/{sample}.RG.recalibrated.{chr}.vcf.gz",
-        phased="test/vcf-phased/{sample}_{chr}.vcf.gz",
+        unphased="test/vcf-unphased/{sample}.{chr}.vcf.gz",
+        phased="test/vcf-phased/{sample}.{chr}.vcf.gz",
     output:
-        merged_vcf="test/vcf-merged/{sample}.{chr}.vcf.gz",
+        merged_vcf="results/vcf-merged/{sample}.{chr}.vcf.gz",
     log:
-        "logs/merge_genotypes/{sample}_{chr}.log"
+        "logs/merge_genotypes/{sample}.{chr}.log"
     shell:
         "python workflow/scripts/merge_genotypes/merge_genotypes.py {input.unphased} {input.phased} {output.merged_vcf} > {log}"
 
 
+rule get_stats:
+    input:
+        expand("logs/merge_genotypes/{sample}.{chr}.log", 
+            sample=SAMPLES, chr=CHROMOSOMES),
+    output:
+         "results/overview.tsv"
+    script:
+        "scripts/aggregate_stats.R"
 
-# add upload rule 
+
+
