@@ -28,7 +28,7 @@ rule merge_genotypes:
     log:
         "logs/merge_genotypes/{sample}.{chr}.log"
     shell:
-        "python workflow/scripts/merge_genotypes/merge_genotypes.py {input.unphased} {input.phased} {output.merged_vcf} > {log}"
+        "python workflow/scripts/merge_genotypes.py {input.unphased} {input.phased} {output.merged_vcf} > {log}"
 
 
 rule get_stats:
