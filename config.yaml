@@ -2,7 +2,8 @@ SAMPLES:
  - sampleA
 CHROMOSOMES: 
  - chr1
-DOWNLOAD_VIA_SCP: True
+REPLACEMENT_STATISTICS_FILENAME: "results/replacement_statistics.tsv"
+DOWNLOAD_VIA_SCP: False
 DOWNLOAD_CMD: 
  - "scp frontend1.eve.ufz.de:/gpfs1/data/oenanthe/niloo/MSMC2/hisponicaComplex/unphased-bamFiles/new-bamFiles-recalibrated/phasing-vcf/{wildcards.sample}_{wildcards.chr}.vcf.gz {output.phased}; "
  - "scp frontend1.eve.ufz.de:/gpfs1/data/oenanthe/niloo/MSMC2/hisponicaComplex/unphased-bamFiles/new-bamFiles-recalibrated/vcf-bed/{wildcards.sample}.RG.recalibrated.{wildcards.chr}.vcf.gz {output.unphased}"

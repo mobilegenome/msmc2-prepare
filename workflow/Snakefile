@@ -9,7 +9,7 @@ rule all:
         expand("results/vcf-merged/{sample}.{chr}.vcf.gz",
         sample=SAMPLES,
         chr=CHROMOSOMES),
-        "results/overview.tsv"
+        config["REPLACEMENT_STATISTICS_FILENAME"]
 
 if config["DOWNLOAD_VIA_SCP"]:
     rule download_files:
@@ -33,10 +33,12 @@ rule merge_genotypes:
 
 rule get_stats:
     input:
-        expand("logs/merge_genotypes/{sample}.{chr}.log", 
+        logfiles=expand("logs/merge_genotypes/{sample}.{chr}.log", 
             sample=SAMPLES, chr=CHROMOSOMES),
     output:
-         "results/overview.tsv"
+         tsv=config["REPLACEMENT_STATISTICS_FILENAME"]
+    params: 
+        fname_suffix="_chr.*"
     script:
         "scripts/aggregate_stats.R"
 
