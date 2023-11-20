@@ -1,4 +1,4 @@
-# Snakemake Workflow for Genotype Merging and Statistics
+# Inject genotypes into a VCF file
 
 This Snakemake workflow is designed for extract phased genotype information from A VCF file and "inject" into another VCF file. 
 It is intended for be used as preparation step for [MSMC2](https://github.com/stschiff/msmc2) that requires input VCF in a specific format, but also requires phasing information. 
